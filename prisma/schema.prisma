@@ -1,0 +1,84 @@
+
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+
+// ENUMS
+
+enum PetGender {
+  male
+  female
+}
+
+enum PetSize {
+  small
+  medium 
+  large
+  xlarge
+}
+
+enum PetAge {
+  baby
+  young
+  adult
+  senior
+}
+
+enum PetSource {
+  local
+  petfinder
+}
+
+
+model Pet {
+  id       String   @id @default(uuid())
+  type     String   
+  gender   PetGender
+  size     PetSize
+  age      PetAge
+  good_with_children Boolean
+  created_at         DateTime   @default(now())
+  photos             PetPhoto[]
+  adoptions        Adoption[] // keep this relation to allow cascaded deletes for local pets
+}
+
+
+model PetPhoto {
+  id      String  @id @default(uuid())
+  url     String
+  petId   String
+  pet     Pet  @relation(fields:[petId], references:[id], onDelete: Cascade)
+}
+
+model Customer {
+  id           String  @id @default(uuid())
+  name         String
+  phone        String    @unique
+  created_at   DateTime  @default(now())
+  adoptions    Adoption[]
+}
+
+model Adoption {
+  id          String  @id @default(uuid())
+  customerId  String
+  customer    Customer  @relation(fields:[customerId], references:[id], onDelete: Cascade)
+
+  // this field stores either the local UUID or the PetFinder ID 
+  petId      String 
+  petType    String  // Denormalized for report
+  source     PetSource
+  localPetId String?
+  localPet   Pet? @relation(fields: [localPetId], references:[id], onDelete: SetNull)
+  created_at  DateTime  @default(now())
+
+
+  @@unique([customerId, petId])
+  @@index([created_at])
+  @@index([source, created_at])
+}
