@@ -1,7 +1,7 @@
 import Fastify, { fastify } from 'fastify';
 import sensible from '@fastify/sensible';
 import cors from '@fastify/cors';
-import { prisma } from './db/prisma';
+import { prisma } from './lib/prisma';
 import { request } from 'node:http';
 
 

@@ -35,10 +35,18 @@ enum PetSource {
   petfinder
 }
 
+enum PetType {
+  cat
+  dog
+  bird
+}
+
+
+
 
 model Pet {
   id       String   @id @default(uuid())
-  type     String   
+  type     PetType   
   gender   PetGender
   size     PetSize
   age      PetAge
@@ -72,13 +80,17 @@ model Adoption {
   // this field stores either the local UUID or the PetFinder ID 
   petId      String 
   petType    String  // Denormalized for report
-  source     PetSource
+  petGender  PetGender
+  petSize    PetSize
+  petAge     PetAge
+  petGoodWithChildren Boolean
+  source     PetSource  @default(local)
   localPetId String?
   localPet   Pet? @relation(fields: [localPetId], references:[id], onDelete: SetNull)
   created_at  DateTime  @default(now())
 
 
-  @@unique([customerId, petId])
+  @@unique([customerId, petId]) 
   @@index([created_at])
   @@index([source, created_at])
 }
