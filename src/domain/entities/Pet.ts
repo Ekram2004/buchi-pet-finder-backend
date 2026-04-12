@@ -10,9 +10,9 @@ export interface Pet {
   gender: PetGender;
   size: PetSize;
   age: PetAge;
- goodWithChildren: boolean;
- photos: string[];
-source: PetSource;
-createdAt?: Date;
+  goodWithChildren: boolean;
+  photos: string[];
+ source: PetSource;
+ createdAt?: Date;
 }
 

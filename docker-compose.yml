@@ -9,7 +9,7 @@ services:
     environment:
       NODE_ENV: development
       PORT: 3000
-      DATABASE_URL: postgresql://postgres:ekrampostgres@db:5432/buchi_db
+      DATABASE_URL: ${DATABASE_URL}
     depends_on:
       - db
   db:

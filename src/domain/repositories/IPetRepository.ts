@@ -1,7 +1,7 @@
 import { Pet, PetAge, PetGender, PetSize , PetType} from "../entities/Pet";
 
 export interface PetFilter {
-  type?: (PetType)[];
+  type?: PetType[];
   gender?: PetGender[];
   size?: PetSize[];
   age?: PetAge[];
