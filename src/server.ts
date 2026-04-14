@@ -1,23 +1,30 @@
 import Fastify from "fastify";
 import cors from "@fastify/cors";
 import {prisma} from "./lib/prisma";
-import { petRoutes } from "./interface/http/routes/petRoutes";
 
 
 import { PrismaPetRepository } from "./infrastructure/database/repositories/PrismaPetRepository";
+import { PrismaCustomerRepository } from "./infrastructure/database/repositories/PrismaCustomerRepository";
+import { PrismaAdoptionRepository } from "./infrastructure/database/repositories/PrismaAdoptionRepository";
 import { PetFinderService } from "./infrastructure/external-api/PetFinderService";
+
 
 
 import { CreatePetUseCase } from "./application/use-cases/pet/CreatePetUseCase";
 import { GetPetsUseCase } from "./application/use-cases/pet/GetPetsUseCase";
 import { AddCustomerUseCase } from "./application/use-cases/cutomer/AddCustomerUseCase";
-import { PrismaCustomerRepository } from "./infrastructure/database/repositories/PrismaCustomerRepository";
+import { AdoptPetUseCase } from "./application/use-cases/adoption/AdoptionPetUseCase";
+
+
+import { petRoutes } from "./interface/http/routes/petRoutes";
 import { customerRoutes } from "./interface/http/routes/customerRoutes";
+import { adoptionRoutes } from "./interface/http/routes/adoptionRoutes";
+
+
 
 const server = Fastify({
-  logger: {
-    transport: { target: "pino-pretty" },
-  },
+  logger: { transport: { target: "pino-pretty" } },
+  ignoreTrailingSlash: true,
 });
 
 async function bootstrap() {
@@ -25,13 +32,23 @@ async function bootstrap() {
 
   
   const petRepo = new PrismaPetRepository();
+  const customerRepo = new PrismaCustomerRepository();
+  const adoptionRepo = new PrismaAdoptionRepository();
   const petFinder = new PetFinderService();
 
   const createPetUseCase = new CreatePetUseCase(petRepo);
   const getPetsUseCase = new GetPetsUseCase(petRepo, petFinder);
-
-  const customerRepo = new PrismaCustomerRepository();
   const addcustomerUseCase = new AddCustomerUseCase(customerRepo);
+  const adoptUseCase = new AdoptPetUseCase(
+    adoptionRepo,
+    petRepo,
+    customerRepo,
+    petFinder,
+  );
+  
+
+  
+
 
    server.register(petRoutes, {
     prefix: "/api/pets",
@@ -42,6 +59,11 @@ async function bootstrap() {
   server.register(customerRoutes, {
     prefix: "/api/customers",
     addcustomerUseCase
+  });
+
+  server.register(adoptionRoutes, {
+    prefix: "/api/adoptions",
+    adoptPetUseCase: adoptUseCase,
   });
   
   server.get("/health", async () => ({ status: "OK", timestamp: new Date() }));
