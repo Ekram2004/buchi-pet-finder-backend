@@ -13,7 +13,7 @@ export class PrismaCustomerRepository implements ICustomerRepository{
         return customer ? { ...customer, createdAt: customer.created_at } : null;
     }
 
-    async save(data: Omit<Customer, "id">): Promise<Customer> {
+    async save(data: Omit<Customer, "id" | 'createdAt'>): Promise<Customer> {
         const customer = await prisma.customer.create({
             data: {
                 name: data.name,

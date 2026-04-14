@@ -10,6 +10,9 @@ import { PetFinderService } from "./infrastructure/external-api/PetFinderService
 
 import { CreatePetUseCase } from "./application/use-cases/pet/CreatePetUseCase";
 import { GetPetsUseCase } from "./application/use-cases/pet/GetPetsUseCase";
+import { AddCustomerUseCase } from "./application/use-cases/cutomer/AddCustomerUseCase";
+import { PrismaCustomerRepository } from "./infrastructure/database/repositories/PrismaCustomerRepository";
+import { customerRoutes } from "./interface/http/routes/customerRoutes";
 
 const server = Fastify({
   logger: {
@@ -27,13 +30,19 @@ async function bootstrap() {
   const createPetUseCase = new CreatePetUseCase(petRepo);
   const getPetsUseCase = new GetPetsUseCase(petRepo, petFinder);
 
-  
-  await server.register(petRoutes, {
+  const customerRepo = new PrismaCustomerRepository();
+  const addcustomerUseCase = new AddCustomerUseCase(customerRepo);
+
+   server.register(petRoutes, {
     prefix: "/api/pets",
     createPetUseCase,
     getPetsUseCase,
   });
 
+  server.register(customerRoutes, {
+    prefix: "/api/customers",
+    addcustomerUseCase
+  });
   
   server.get("/health", async () => ({ status: "OK", timestamp: new Date() }));
 
