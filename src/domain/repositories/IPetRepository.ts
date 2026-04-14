@@ -11,7 +11,7 @@ export interface PetFilter {
 
 
 export interface IPetRepository {
-    save(pet: Omit<Pet, 'id'>): Promise<Pet>;
+    save(pet: Omit<Pet, 'id' | 'source' | 'createdAt'>): Promise<Pet>;
     findAll(filter: PetFilter): Promise<Pet[]>;
     findById(id: string): Promise<Pet | null>;
 }

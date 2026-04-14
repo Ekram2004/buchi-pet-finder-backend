@@ -4,13 +4,13 @@ import { prisma } from '../../../lib/prisma';
 import { PrismaPetMapper } from "../mappers/PrismaPetMapper";
 
 export class PrismaPetRepository implements IPetRepository{
-    async save(pet: any): Promise<Pet>{
+    async save(pet: Omit<Pet, 'id' | 'source' | 'createdAt'>): Promise<Pet>{
         const created = await prisma.pet.create({
           data: {
-            type: pet.type,
-            gender: pet.gender,
-            size: pet.size,
-            age: pet.age,
+            type: pet.type as any,
+            gender: pet.gender as any,
+            size: pet.size as any,
+            age: pet.age as any,
             good_with_children: pet.goodWithChildren,
             photos: {
                 create: pet.photos.map((url:string)=>({url}))
@@ -23,10 +23,10 @@ export class PrismaPetRepository implements IPetRepository{
     async findAll(filter: PetFilter): Promise<Pet[]> {
         const pets = await prisma.pet.findMany({
             where: {
-                type: filter.type ? { in: filter.type } : undefined,
-                gender: filter.gender ? { in: filter.gender } : undefined,
-                size: filter.size ? { in: filter.size } : undefined,
-                age: filter.age ? { in: filter.age } : undefined,
+                type: filter.type ? { in: filter.type as any } : undefined,
+                gender: filter.gender ? { in: filter.gender as any } : undefined,
+                size: filter.size ? { in: filter.size as any } : undefined,
+                age: filter.age ? { in: filter.age as any } : undefined,
                 good_with_children: filter.goodWithChildren
             },
             take: filter.limit,
