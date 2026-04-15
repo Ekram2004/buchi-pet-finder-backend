@@ -1,5 +1,5 @@
 import { FastifyReply, FastifyRequest } from "fastify";
-import { AddCustomerUseCase } from "../../../application/use-cases/cutomer/AddCustomerUseCase";
+import { AddCustomerUseCase } from "../../../application/use-cases/customer/AddCustomerUseCase";
 
 
 export class CustomerController {

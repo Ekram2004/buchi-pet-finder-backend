@@ -12,7 +12,7 @@ import { PetFinderService } from "./infrastructure/external-api/PetFinderService
 
 import { CreatePetUseCase } from "./application/use-cases/pet/CreatePetUseCase";
 import { GetPetsUseCase } from "./application/use-cases/pet/GetPetsUseCase";
-import { AddCustomerUseCase } from "./application/use-cases/cutomer/AddCustomerUseCase";
+import { AddCustomerUseCase } from "./application/use-cases/customer/AddCustomerUseCase";
 import { AdoptPetUseCase } from "./application/use-cases/adoption/AdoptionPetUseCase";
 import { GetAdoptionRequestUseCase } from "./application/use-cases/adoption/GetAdoptionRequestUseCase";
 
