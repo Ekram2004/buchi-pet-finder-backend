@@ -15,6 +15,7 @@ import { GetPetsUseCase } from "./application/use-cases/pet/GetPetsUseCase";
 import { AddCustomerUseCase } from "./application/use-cases/customer/AddCustomerUseCase";
 import { AdoptPetUseCase } from "./application/use-cases/adoption/AdoptionPetUseCase";
 import { GetAdoptionRequestUseCase } from "./application/use-cases/adoption/GetAdoptionRequestUseCase";
+import { GenerateReportUseCase } from "./application/use-cases/adoption/GenerateReportUseCase";
 
 
 import { petRoutes } from "./interface/http/routes/petRoutes";
@@ -48,6 +49,8 @@ async function bootstrap() {
   );
   
   const getRequestsUseCase = new GetAdoptionRequestUseCase(adoptionRepo);
+  const generateReportUseCase = new GenerateReportUseCase(adoptionRepo);
+
   
 
 
@@ -65,8 +68,10 @@ async function bootstrap() {
   server.register(adoptionRoutes, {
     prefix: "/api/adoptions",
     adoptPetUseCase: adoptUseCase,
-    getRequestsUseCase
+    getRequestsUseCase,
+    generateReportUseCase
   });
+
   
   server.get("/health", async () => ({ status: "OK", timestamp: new Date() }));
 

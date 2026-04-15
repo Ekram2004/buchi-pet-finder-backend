@@ -1,48 +1,39 @@
-
 import { IAdoptionRepository } from "../../../domain/repositories/IAdoptionRepostory";
 
 export class GenerateReportUseCase {
-  constructor(private adoptionRepository: IAdoptionRepository) {}
+  constructor(private adoptionRepo: IAdoptionRepository) { }
+  
+  async execute(fromDate: string, toDate: string) {
+    const start = new Date(fromDate);
+    const end = new Date(toDate);
+    end.setHours(23, 59, 59, 999);
 
-  async execute(fromDate: Date, toDate: Date) {
-    const adoptions = await this.adoptionRepository.getReportData(
-      fromDate,
-      toDate,
-    );
+    const adoptions = await this.adoptionRepo.getReportData(start, end);
 
-    // 1. Group by Pet Type
-    const typeCounts = adoptions.reduce(
-      (acc, curr) => {
-        const type = curr.petType;
-        acc[type] = (acc[type] || 0) + 1;
-        return acc;
-      },
-      {} as Record<string, number>,
-    );
+    //  1 Aggregate by Pet type
+    const adopted_pet_types: Record<string, number> = {};
+    adoptions.forEach(a => {
+      adopted_pet_types[a.petType] = (adopted_pet_types[a.petType] || 0) + 1;
+    });
 
-    // 2. Group by Week
-    const weeklyRequests = adoptions.reduce(
-      (acc, curr) => {
-        const week = this.getWeekNumber(curr.createdAt);
-        const year = curr.createdAt.getFullYear();
-        const key = `${year}-W${week}`;
-        acc[key] = (acc[key] || 0) + 1;
-        return acc;
-      },
-      {} as Record<string, number>,
-    );
+    // 2 Aggregate by Week 
+    const weekly_adoption_requests : Record<string, number> = {};
 
+    adoptions.forEach(a => {
+      const diffInTime = a.createdAt.getTime() - start.getTime();
+      const diffInDays = Math.floor(diffInTime / (1000 * 3600 * 24));
+      const weekNumber = Math.floor(diffInDays / 7);
+
+      // Calculate the start date of that specific week 
+      const weekStartDate = new Date(start);
+      weekStartDate.setDate(start.getDate() + (weekNumber * 7));
+      const weekKey = weekStartDate.toISOString().split('T')[0];
+
+      weekly_adoption_requests[weekKey] = (weekly_adoption_requests[weekKey] || 0) + 1;
+    });
     return {
-      totalAdoptions: adoptions.length,
-      adoptedPetTypes: typeCounts,
-      weeklyAdoptionRequests: weeklyRequests,
-    };
-  }
-
-  private getWeekNumber(date: Date): number {
-    const firstDayOfYear = new Date(date.getFullYear(), 0, 1);
-    const pastDaysOfYear =
-      (date.getTime() - firstDayOfYear.getTime()) / 86400000;
-    return Math.ceil((pastDaysOfYear + firstDayOfYear.getDay() + 1) / 7);
+      adopted_pet_types,
+      weekly_adoption_requests
+    }
   }
 }

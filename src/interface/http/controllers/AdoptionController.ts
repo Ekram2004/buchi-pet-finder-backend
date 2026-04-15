@@ -1,11 +1,13 @@
 import { FastifyReply, FastifyRequest } from "fastify";
 import { AdoptPetUseCase } from "../../../application/use-cases/adoption/AdoptionPetUseCase";
 import { GetAdoptionRequestUseCase } from "../../../application/use-cases/adoption/GetAdoptionRequestUseCase";
+import { GenerateReportUseCase } from "../../../application/use-cases/adoption/GenerateReportUseCase";
 
 export class AdoptionController {
     constructor(
         private adoptPetUseCase: AdoptPetUseCase,
-        private getRequestUseCase: GetAdoptionRequestUseCase
+        private getRequestUseCase:GetAdoptionRequestUseCase,
+        private generateReportUseCase: GenerateReportUseCase
     )
     { }
     
@@ -52,6 +54,27 @@ export class AdoptionController {
              return reply
                .status(500)
                .send({ status: "error", message: error.message });
+        }
+    }
+
+    async generateReport(request: FastifyRequest, reply: FastifyReply) {
+        try {
+            const { from_date, to_date } = request.body as any;
+
+            if (!from_date || !to_date) {
+                return reply.status(400).send({status:'error', message:'from_date and to_date are required'})
+            }
+
+            const report = await this.generateReportUseCase.execute(from_date, to_date);
+
+            return reply.status(200).send({
+        status: 'success',
+        data: report
+      });
+        } catch (error: any) {
+            return reply
+              .status(500)
+              .send({ status: "error", message: error.message });
         }
     }
 }
