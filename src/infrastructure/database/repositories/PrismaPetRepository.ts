@@ -5,6 +5,7 @@ import { PrismaPetMapper } from "../mappers/PrismaPetMapper";
 
 export class PrismaPetRepository implements IPetRepository{
     async save(pet: Omit<Pet, 'id' | 'source' | 'createdAt'>): Promise<Pet>{
+        const photoUrls = pet.Photo || [];
         const created = await prisma.pet.create({
           data: {
             type: pet.type as any,
@@ -13,7 +14,7 @@ export class PrismaPetRepository implements IPetRepository{
             age: pet.age as any,
             good_with_children: pet.goodWithChildren,
             photos: {
-                create: pet.photos.map((url:string)=>({url}))
+                create: photoUrls.map((url:string)=>({url}))
             }
             },
             include:{photos: true}

@@ -55,7 +55,6 @@ async function bootstrap() {
 
 
    server.register(petRoutes, {
-    prefix: "/api/pets",
     createPetUseCase,
     getPetsUseCase,
   });

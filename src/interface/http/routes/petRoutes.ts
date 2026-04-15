@@ -28,7 +28,7 @@ export async function petRoutes(fastify: FastifyInstance, options: PetRoutesOpti
         "size",
         "age",
         "good_with_children",
-        "photos",
+        "Photo",
       ],
       properties: {
         type: { type: "string", enum: Object.values(PetType) },
@@ -131,7 +131,7 @@ export async function petRoutes(fastify: FastifyInstance, options: PetRoutesOpti
 
 
   fastify.post(
-    "/",
+    "/create_pet",
     { schema: createPetSchema },
     controller.createPet.bind(controller),
   );

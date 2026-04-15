@@ -36,9 +36,9 @@ enum PetSource {
 }
 
 enum PetType {
-  cat
-  dog
-  bird
+  Dog
+  Cat
+  Bird
 }
 
 

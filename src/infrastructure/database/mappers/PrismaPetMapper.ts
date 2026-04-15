@@ -10,7 +10,7 @@ export class PrismaPetMapper {
             size: prismaPet.size as PetSize,
             age: prismaPet.age as PetAge,
             goodWithChildren: prismaPet.good_with_children,
-            photos: prismaPet.photos?.map(p => p.url) || [],
+            Photo: prismaPet.photos?.map(p => p.url) || [],
             source: PetSource.LOCAL,
             createdAt: prismaPet.created_at
         };

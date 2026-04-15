@@ -80,7 +80,7 @@ export class PetFinderService{
           size: PetSize.MEDIUM,
           age: PetAge.ADULT,
           goodWithChildren: true,
-            photos: ["https://example.com/pf-dog.jpg"],
+            Photo: ["https://example.com/pf-dog.jpg"],
             source: PetSource.PETFINDER,
           createdAt: new Date()
         };

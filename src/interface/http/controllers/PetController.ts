@@ -17,7 +17,7 @@ interface CreatePetRequestBody {
   size: PetSize;
   age: PetAge;
   good_with_children: boolean;
-  photos: string[];
+  Photo: string[];
 }
 
 interface GetPetsRequestQuery {
@@ -46,7 +46,7 @@ export class PetController {
         size: request.body.size,
         age: request.body.age,
         goodWithChildren: request.body.good_with_children,
-        photos: request.body.photos,
+        Photo: request.body.Photo,
       };
       const newPet = await this.createPetUseCase.execute(petInput);
 
@@ -104,7 +104,7 @@ export class PetController {
         size: pet.size,
         age: pet.age,
         good_with_children: pet.goodWithChildren,
-        photos: pet.photos,
+        photos: pet.Photo,
         source: pet.source,
       }));
 
