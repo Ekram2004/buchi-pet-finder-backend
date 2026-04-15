@@ -37,7 +37,7 @@ export class AdoptionController {
 
             const data = await this.getRequestUseCase.execute(from_date, to_date);
             return reply.status(200).send({
-                status: 'succes',
+                status: 'success',
                 data: data.map(item => ({
                     customer_id: item.customer.id,
                     customer_phone: item.customer.phone,

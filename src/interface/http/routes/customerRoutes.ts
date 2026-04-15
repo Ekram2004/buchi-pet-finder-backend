@@ -5,5 +5,5 @@ export async function customerRoutes(fastify: FastifyInstance, options: any) {
     const { addcustomerUseCase } = options;
     const controller = new CustomerController(addcustomerUseCase);
 
-    fastify.post('/', controller.addCustomer.bind(controller));
+    fastify.post('/add_customer', controller.addCustomer.bind(controller));
 }

@@ -40,14 +40,19 @@ export class PetController {
     reply: FastifyReply,
   ) {
     try {
+      const body = request.body as any;
+
+      // 1. Debug: Let's see exactly what keys exist in the body
+      console.log("KEYS RECEIVED IN BODY:", Object.keys(body));
       const petInput: Omit<Pet, "id" | "source" | "createdAt"> = {
-        type: request.body.type,
-        gender: request.body.gender,
-        size: request.body.size,
-        age: request.body.age,
-        goodWithChildren: request.body.good_with_children,
-        Photo: request.body.Photo,
+        type: body.type,
+        gender: body.gender,
+        size: body.size,
+        age: body.age,
+        goodWithChildren: body.good_with_children,
+        Photo: body.Photo || body.photos || body.photo || [],
       };
+      console.log("FINAL MAPPED INPUT:", petInput);
       const newPet = await this.createPetUseCase.execute(petInput);
 
       return reply.status(201).send({

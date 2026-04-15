@@ -1,11 +1,11 @@
 import { IPetRepository, PetFilter } from "../../../domain/repositories/IPetRepository";
 import { Pet } from "../../../domain/entities/Pet";
-import { prisma } from '../../../lib/prisma';
+import { prisma} from '../../../lib/prisma';
 import { PrismaPetMapper } from "../mappers/PrismaPetMapper";
 
 export class PrismaPetRepository implements IPetRepository{
     async save(pet: Omit<Pet, 'id' | 'source' | 'createdAt'>): Promise<Pet>{
-        const photoUrls = pet.Photo || [];
+        // const photoUrls = pet.Photo || [];
         const created = await prisma.pet.create({
           data: {
             type: pet.type as any,
@@ -14,7 +14,7 @@ export class PrismaPetRepository implements IPetRepository{
             age: pet.age as any,
             good_with_children: pet.goodWithChildren,
             photos: {
-                create: photoUrls.map((url:string)=>({url}))
+                create: pet.Photo.map((url:string)=>({url}))
             }
             },
             include:{photos: true}

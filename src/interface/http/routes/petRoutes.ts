@@ -5,7 +5,7 @@ import { PetController } from '../controllers/PetController';
 import { CreatePetUseCase } from '../../../application/use-cases/pet/CreatePetUseCase';
 import { GetPetsUseCase } from '../../../application/use-cases/pet/GetPetsUseCase';
 import { PrismaPetRepository } from '../../../infrastructure/database/repositories/PrismaPetRepository';
-import { PetFinderService } from '../../../infrastructure/external-api/PetFinderService';
+import { PetFinderService } from "../../../infrastructure/external-api/PetFinderService";
 import { PetGender, PetSize, PetAge, PetType, PetSource } from '../../../domain/entities/Pet';
 
 
@@ -36,7 +36,7 @@ export async function petRoutes(fastify: FastifyInstance, options: PetRoutesOpti
         size: { type: "string", enum: Object.values(PetSize) },
         age: { type: "string", enum: Object.values(PetAge) },
         good_with_children: { type: "boolean" },
-        photos: { type: "array", items: { type: "string" } },
+        Photo: { type: "array", items: { type: "string" } },
       },
       additionalProperties: false,
     },
@@ -137,7 +137,7 @@ export async function petRoutes(fastify: FastifyInstance, options: PetRoutesOpti
   );
   
   fastify.get(
-    "/",
+    "/get_pets",
     { schema: getPetsSchema },
     controller.getPets.bind(controller),
   );

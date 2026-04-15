@@ -16,6 +16,9 @@ COPY . .
 # Build TypeScript code
 RUN npm run build
 
+
+RUN mkdir -p /app/uploads && chmod 777 /app/uploads
+
 # Expose port
 EXPOSE 3000
 

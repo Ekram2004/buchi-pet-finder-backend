@@ -1,15 +1,20 @@
 import Fastify from "fastify";
 import cors from "@fastify/cors";
-import {prisma} from "./lib/prisma";
+import fastifyMultipart from "@fastify/multipart";
+import fastifyStatic from "@fastify/static";
+import path from "path";
 
 
+import { prisma } from "./lib/prisma";
+
+// Infrastructure Layer
 import { PrismaPetRepository } from "./infrastructure/database/repositories/PrismaPetRepository";
 import { PrismaCustomerRepository } from "./infrastructure/database/repositories/PrismaCustomerRepository";
 import { PrismaAdoptionRepository } from "./infrastructure/database/repositories/PrismaAdoptionRepository";
 import { PetFinderService } from "./infrastructure/external-api/PetFinderService";
+import { FileStorageService } from "./infrastructure/services/FileService";
 
-
-
+// Application Layer (Use Cases)
 import { CreatePetUseCase } from "./application/use-cases/pet/CreatePetUseCase";
 import { GetPetsUseCase } from "./application/use-cases/pet/GetPetsUseCase";
 import { AddCustomerUseCase } from "./application/use-cases/customer/AddCustomerUseCase";
@@ -22,23 +27,37 @@ import { petRoutes } from "./interface/http/routes/petRoutes";
 import { customerRoutes } from "./interface/http/routes/customerRoutes";
 import { adoptionRoutes } from "./interface/http/routes/adoptionRoutes";
 
-
-
 const server = Fastify({
   logger: { transport: { target: "pino-pretty" } },
   ignoreTrailingSlash: true,
 });
 
 async function bootstrap() {
+  // 1. Register Core Plugins
   await server.register(cors);
 
+  // Register multipart to support file streams in the Controller
+  await server.register(fastifyMultipart, {
+    limits: {
+      fileSize: 10 * 1024 * 1024, // 10MB limit
+    },
+  });
+
   
+  server.register(fastifyStatic, {
+    root: path.join(process.cwd(), "uploads"),
+    prefix: "/uploads/",
+  });
+
+  // 2. Initialize Infrastructure
   const petRepo = new PrismaPetRepository();
   const customerRepo = new PrismaCustomerRepository();
   const adoptionRepo = new PrismaAdoptionRepository();
   const petFinder = new PetFinderService();
+  const fileService = new FileStorageService(); // Updated name
 
-  const createPetUseCase = new CreatePetUseCase(petRepo);
+  // 3. Initialize Use Cases (Dependency Injection)
+  const createPetUseCase = new CreatePetUseCase(petRepo, fileService);
   const getPetsUseCase = new GetPetsUseCase(petRepo, petFinder);
   const addcustomerUseCase = new AddCustomerUseCase(customerRepo);
   const adoptUseCase = new AdoptPetUseCase(
@@ -47,41 +66,42 @@ async function bootstrap() {
     customerRepo,
     petFinder,
   );
-  
+
   const getRequestsUseCase = new GetAdoptionRequestUseCase(adoptionRepo);
   const generateReportUseCase = new GenerateReportUseCase(adoptionRepo);
 
-  
+  // 4. Register Routes
 
-
-   server.register(petRoutes, {
+  server.register(petRoutes, {
     createPetUseCase,
     getPetsUseCase,
+    fileService, 
   });
 
   server.register(customerRoutes, {
-    prefix: "/api/customers",
-    addcustomerUseCase
+    addcustomerUseCase,
   });
 
   server.register(adoptionRoutes, {
-    prefix: "/api/adoptions",
     adoptPetUseCase: adoptUseCase,
     getRequestsUseCase,
-    generateReportUseCase
+    generateReportUseCase,
   });
 
-  
+  // Health Check
   server.get("/health", async () => ({ status: "OK", timestamp: new Date() }));
 
-  
+  // 5. Start Server
   try {
     await prisma.$connect();
     server.log.info("Database connected successfully");
+
+    const port = Number(process.env.PORT) || 3000;
     const address = await server.listen({
-      port: Number(process.env.PORT) || 3000,
-      host: "0.0.0.0",
+      port: port,
+      host: "0.0.0.0", // Required for Docker
     });
+
     server.log.info(`Buchi Backend is running at ${address}`);
   } catch (err) {
     server.log.error(err, "Error starting server or connecting to DB");
@@ -89,7 +109,7 @@ async function bootstrap() {
   }
 }
 
-// Handle Graceful Shutdown
+// Graceful Shutdown
 const signals: NodeJS.Signals[] = ["SIGINT", "SIGTERM"];
 signals.forEach((signal) => {
   process.on(signal, async () => {

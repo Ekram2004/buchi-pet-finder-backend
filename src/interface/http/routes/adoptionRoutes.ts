@@ -9,9 +9,12 @@ export async function adoptionRoutes(fastify: FastifyInstance, options: any) {
       getRequestsUseCase,
       generateReportUseCase
     );
-    fastify.post('/', controller.adopt.bind(controller));
-  fastify.get("/", controller.getRequests.bind(controller));
+    fastify.post('/adopt', controller.adopt.bind(controller));
+  fastify.get(
+    "/get_adoption_requests",
+    controller.getRequests.bind(controller),
+  );
   
   // BOUNS ENDPOINT
-  fastify.post('/report', controller.generateReport.bind(controller));
+  fastify.post("/generate_report", controller.generateReport.bind(controller));
 }
