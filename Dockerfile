@@ -1,5 +1,6 @@
-# Use Node 20 runtime
-FROM node:20-alpine
+
+FROM node:22.12-alpine
+
 
 # Set working directory
 WORKDIR /app

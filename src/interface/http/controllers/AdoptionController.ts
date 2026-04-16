@@ -42,7 +42,7 @@ export class AdoptionController {
                     customer_id: item.customer.id,
                     customer_phone: item.customer.phone,
                     customer_name: item.customer.name,
-                    "Pet id": item.petId,
+                    "pet_id": item.petId,
                     type: item.petType,
                     gender: item.petGender,
                     size: item.petSize,
