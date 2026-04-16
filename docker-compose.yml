@@ -10,6 +10,8 @@ services:
       NODE_ENV: development
       PORT: 3000
       DATABASE_URL: ${DATABASE_URL}
+      DOG_API_KEY: ${DOG_API_KEY}
+      CAT_API_KEY: ${CAT_API_KEY}
     depends_on:
       - db
     volumes:
